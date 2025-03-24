@@ -69,7 +69,7 @@ public class Controller {
                                 if (changeWanted.equals("описание")) {
                                     System.out.println("Какое будет новое описание?");
                                     String newDescription = myScanner.nextLine();
-                                    myService.changeTaskDescription(task, newDescription);
+                                    myService.changeTask(task, newDescription, "description");
                                 }
                                 if (changeWanted.equals("срок выполнения")) {
                                     System.out.println("Какой будет новый срок выполнения?");
@@ -81,13 +81,13 @@ public class Controller {
                                         System.out.println("Неверный формат даты. Используйте ГГГГ-ММ-ДД");
                                         continue mainLoop;
                                     }
-                                    myService.changeTaskDeadline(task, newDeadline);
+                                    myService.changeTask(task, newDeadline, "deadline");
                                 }
                                 if (changeWanted.equals("статус")) {
                                     System.out.println("Какой будет новый статус?");
                                     try {
                                         Status newStatus = Service.findStatusByName(myScanner.nextLine());
-                                        myService.changeTaskStatus(task, newStatus);
+                                        myService.changeTask(task, newStatus, "status");
                                     } catch (NoSuchElementException e) {
                                         System.out.println("Нет такого статуса");
                                         continue mainLoop;

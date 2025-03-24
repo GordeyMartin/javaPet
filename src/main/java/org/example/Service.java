@@ -60,15 +60,16 @@ public class Service {
                 .orElseThrow();
         return foundTask;
     }
-    void changeTaskDescription(Task task, String description) {
-        task.setDescription(description);
+    <V> void changeTask(Task task, V newVal, String field) {
+        if (field.equals("description")) {
+            task.setDescription((String) newVal);
+        } else if (field.equals("deadline")) {
+            task.setDeadline((LocalDate) newVal);
+        } else if(field.equals("status")) {
+            task.setTaskStatus((Status) newVal);
+        }
     }
-    void changeTaskDeadline(Task task, LocalDate deadline) {
-        task.setDeadline(deadline);
-    }
-    void changeTaskStatus(Task task, Status status) {
-        task.setTaskStatus(status);
-    }
+
     void deleteTask(Task task) {
         listOfAllTasks.remove(task);
     }

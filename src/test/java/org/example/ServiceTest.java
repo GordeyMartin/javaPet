@@ -41,8 +41,8 @@ public class ServiceTest {
     }
 
     @Test
-    void changeTaskStatusTest() {
-        myService.changeTaskStatus(myService.findTaskByName("Уборка"), Status.DONE);
+    void changeTaskTest() {
+        myService.changeTask(myService.findTaskByName("Уборка"), Status.DONE, "status");
         Assertions.assertEquals(Status.DONE, myService.findTaskByName("Уборка").getTaskStatus());
     }
 
