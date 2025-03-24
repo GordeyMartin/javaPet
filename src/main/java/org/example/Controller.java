@@ -1,110 +1,143 @@
 package org.example;
 
+import org.example.repository.Command;
 import org.example.repository.Status;
 import org.example.repository.Task;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
+
 public class Controller {
     public static void main(String[] args) {
-        Scanner myScanner = new Scanner(System.in);
-        Service myService = new Service();
+        try {
+            Scanner myScanner = new Scanner(System.in);
+            Service myService = new Service();
 
-        boolean stopped = false;
-        while (!stopped) {
-            System.out.println("Введите команду");
-            String command = myScanner.nextLine();
-
-            if (command.equals("add")) {
-                System.out.println("Введите название задачи");
-                String name = myScanner.nextLine();
-
-                System.out.println("Введите описание задачи");
-                String description = myScanner.nextLine();
-
-                System.out.println("Введите срок выполнения задачи");
-                String deadline = myScanner.nextLine();
-
-                System.out.println("Введите статус задачи (todo, in progress, done)");
-                String statusString = myScanner.nextLine();
+            boolean stopped = false;
+            mainLoop:
+            while (!stopped) {
                 try {
-                    Status status = Service.findStatusByName(statusString);
-                    myService.addTask(name, description, deadline, status);
-                } catch (NoSuchElementException e) {
-                    System.out.println("Нет такого статуса");
-                    continue;
-                }
-            }
+                    System.out.println("Введите команду");
+                    String commandString = myScanner.nextLine();
+                    Command command = Service.findCommandByName(commandString);
+                    switch (command) {
+                        case Command.ADD:
+                            System.out.println("Введите название задачи");
+                            String nameToAdd = myScanner.nextLine();
 
-            if (command.equals("list")) {
-                for (Task t: myService.getListOfAllTasks()) {
-                    System.out.println(t);
-                }
-            }
+                            System.out.println("Введите описание задачи");
+                            String description = myScanner.nextLine();
 
-            if (command.equals("edit")) {
-                System.out.println("Какую задачу вы хотите изменить? (Напишите имя задачи)");
-                String name = myScanner.nextLine();
-                try{
-                    Task task = myService.findTaskByName(name);
+                            System.out.println("Введите срок выполнения задачи (в формате ГГГГ-ММ-ДД)");
+                            String deadlineString = myScanner.nextLine();
+                            LocalDate deadline;
+                            try {
+                                deadline = LocalDate.parse(deadlineString);
+                            } catch (DateTimeParseException e) {
+                                System.out.println("Неверный формат даты. Используйте ГГГГ-ММ-ДД");
+                                continue mainLoop;
+                            }
+                            System.out.println("Введите статус задачи (todo, in progress, done)");
+                            String statusString = myScanner.nextLine();
+                            try {
+                                Status status = Service.findStatusByName(statusString);
+                                myService.addTask(nameToAdd, description, deadline, status);
+                            } catch (NoSuchElementException e) {
+                                System.out.println("Нет такого статуса");
+                                continue mainLoop;
+                            }
+                            break;
 
-                    System.out.println("Что вы хотите изменить? (описание, срок выполнения, статус)");
-                    String changeWanted = myScanner.nextLine();
+                        case Command.LIST:
+                            for (Task t: myService.getListOfAllTasks()) {
+                                System.out.println(t);
+                            }
+                            break;
 
-                    if (changeWanted.equals("описание")) {
-                        System.out.println("Какое будет новое описание?");
-                        String newDescription = myScanner.nextLine();
-                        myService.changeTaskDescription(task, newDescription);
+                        case Command.EDIT:
+                            System.out.println("Какую задачу вы хотите изменить? (Напишите имя задачи)");
+                            String nameToEdit = myScanner.nextLine();
+                            try{
+                                Task task = myService.findTaskByName(nameToEdit);
+
+                                System.out.println("Что вы хотите изменить? (описание, срок выполнения, статус)");
+                                String changeWanted = myScanner.nextLine();
+
+                                if (changeWanted.equals("описание")) {
+                                    System.out.println("Какое будет новое описание?");
+                                    String newDescription = myScanner.nextLine();
+                                    myService.changeTaskDescription(task, newDescription);
+                                }
+                                if (changeWanted.equals("срок выполнения")) {
+                                    System.out.println("Какой будет новый срок выполнения?");
+                                    String newDeadlineString = myScanner.nextLine();
+                                    LocalDate newDeadline;
+                                    try {
+                                        newDeadline = LocalDate.parse(newDeadlineString);
+                                    } catch (DateTimeParseException e) {
+                                        System.out.println("Неверный формат даты. Используйте ГГГГ-ММ-ДД");
+                                        continue mainLoop;
+                                    }
+                                    myService.changeTaskDeadline(task, newDeadline);
+                                }
+                                if (changeWanted.equals("статус")) {
+                                    System.out.println("Какой будет новый статус?");
+                                    try {
+                                        Status newStatus = Service.findStatusByName(myScanner.nextLine());
+                                        myService.changeTaskStatus(task, newStatus);
+                                    } catch (NoSuchElementException e) {
+                                        System.out.println("Нет такого статуса");
+                                        continue mainLoop;
+                                    }
+                                }
+                            } catch (NoSuchElementException e) {
+                                System.out.println("Такой задачи нет");
+                                continue mainLoop;
+                            }
+                            break;
+
+                        case Command.DELETE:
+                            System.out.println("Какую задачу вы хотите изменить? (Напишите имя задачи)");
+                            String nameToDelete = myScanner.nextLine();
+                            try {
+                                Task task = myService.findTaskByName(nameToDelete);
+                                myService.deleteTask(task);
+                            } catch (NoSuchElementException e) {
+                                System.out.println("Нет такой задачи");
+                                continue mainLoop;
+                            }
+                            break;
+
+                        case Command.FILTER:
+                            System.out.println("Задачи с каким статусом вы ищете? (todo, in progress, done)");
+                            try {
+                                Status status = Service.findStatusByName(myScanner.nextLine());
+                                System.out.println(myService.filterTasksByStatus(status));
+                            } catch (NoSuchElementException e) {
+                                System.out.println("Нет такого статуса");
+                                continue mainLoop;
+                            }
+                            break;
+
+                        case Command.SORT:
+                            System.out.println(myService.sortTasks());
+                            break;
+
+                        case Command.EXIT:
+                            stopped = true;
+                            break;
                     }
-                    if (changeWanted.equals("срок выполнения")) {
-                        System.out.println("Какой будет новый срок выполнения?");
-                        String newDeadline = myScanner.nextLine();
-                        myService.changeTaskDeadline(task, newDeadline);
-                    }
-                    if (changeWanted.equals("статус")) {
-                        System.out.println("Какой будет новый статус?");
-                        try {
-                            Status newStatus = Service.findStatusByName(myScanner.nextLine());
-                            myService.changeTaskStatus(task, newStatus);
-                        } catch (NoSuchElementException e) {
-                            System.out.println("Нет такого статуса");
-                            continue;
-                        }
-                    }
                 } catch (NoSuchElementException e) {
-                    System.out.println("Такой задачи нет");
-                    continue;
+                    System.out.println("Такой команды нет");
+                    continue mainLoop;
                 }
             }
-            if (command.equals("delete")) {
-                System.out.println("Какую задачу вы хотите изменить? (Напишите имя задачи)");
-                String name = myScanner.nextLine();
-                try {
-                    Task task = myService.findTaskByName(name);
-                    myService.deleteTask(task);
-                } catch (NoSuchElementException e) {
-                    System.out.println("Нет такой задачи");
-                    continue;
-                }
-            }
-            if (command.equals("filter")) {
-                System.out.println("Задачи с каким статусом вы ищете? (todo, in progress, done)");
-                try {
-                    Status status = Service.findStatusByName(myScanner.nextLine());
-                    System.out.println(myService.filterTasksByStatus(status));
-                } catch (NoSuchElementException e) {
-                    System.out.println("Нет такого статуса");
-                    continue;
-                }
-            }
-            if (command.equals("sort")) {
-                System.out.println(myService.sortTasks());
-            }
-            if (command.equals("exit")) {
-                stopped = true;
-            }
-            System.out.println("Действие прошло успешно");
+        } catch (Exception e) {
+            System.out.println("Неизвестный ввод. Приложение перезапускается");
+            main(args);
         }
     }
 }

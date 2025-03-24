@@ -2,6 +2,8 @@ package org.example.repository;
 
 import lombok.*;
 
+import java.time.LocalDate;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -11,7 +13,7 @@ public class Task {
 
     String description;
 
-    String deadline;
+    LocalDate deadline;
 
     Status taskStatus;
 }

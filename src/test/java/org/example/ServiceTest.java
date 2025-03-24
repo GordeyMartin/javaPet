@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -16,9 +17,9 @@ public class ServiceTest {
     @BeforeEach
     void addSomeTasks() {
         myService = new Service();
-        myService.addTask("Уборка", "Не забудь убраться", "До среды", Status.TODO);
-        myService.addTask("Выучи Java", "Стань супер разработчиком", "Как можно скорее", Status.IN_PROGRESS);
-        myService.addTask("Пройди Stream API", "Закончи step по Stream API в Java", "До субботы", Status.DONE);
+        myService.addTask("Уборка", "Не забудь убраться", LocalDate.parse("2004-12-12"), Status.TODO);
+        myService.addTask("Выучи Java", "Стань супер разработчиком", LocalDate.parse("2020-10-12"), Status.IN_PROGRESS);
+        myService.addTask("Пройди Stream API", "Закончи step по Stream API в Java", LocalDate.parse("2014-11-11"), Status.DONE);
     }
 
     @Test
@@ -35,7 +36,7 @@ public class ServiceTest {
 
     @Test
     void addTaskTest() {
-        myService.addTask("Новое дело", "Описание нового дела", "До скорого", Status.TODO);
+        myService.addTask("Новое дело", "Описание нового дела", LocalDate.parse("2021-10-12"), Status.TODO);
         Assertions.assertEquals("Новое дело", myService.findTaskByName("Новое дело").getName());
     }
 
@@ -65,12 +66,17 @@ public class ServiceTest {
         myService.deleteTask(myService.findTaskByName("Уборка"));
         myService.deleteTask(myService.findTaskByName("Выучи Java"));
 
-        Task task1 = new Task("1", "1", "1", Status.DONE);
-        Task task2 = new Task("2", "2", "2", Status.TODO);
+        Task task1 = new Task("1", "1", LocalDate.parse("2020-10-12"), Status.DONE);
+        Task task2 = new Task("2", "2", LocalDate.parse("2021-10-12"), Status.TODO);
         List<Task> listOfStacks = Arrays.asList(task1, task2);
         myService.addTaskbyTask(task2);
         myService.addTaskbyTask(task1);
 
         Assertions.assertEquals(listOfStacks, myService.sortTasks());
+    }
+
+    @Test
+    void taskNameDublicateTest() {
+        Assertions.assertThrows(TaskNameDublicateException.class, () -> myService.addTask("Уборка", "Опять таки не забудь убраться", LocalDate.parse("2023-10-12"), Status.TODO));
     }
 }

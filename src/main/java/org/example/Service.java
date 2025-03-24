@@ -1,8 +1,10 @@
 package org.example;
 
+import org.example.repository.Command;
 import org.example.repository.Status;
 import org.example.repository.Task;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -18,14 +20,33 @@ public class Service {
         }
         throw new NoSuchElementException("Нет такого варианта для статуса задачи");
     }
-
-    void addTask(String name, String description, String deadline, Status status) {
-        Task newTask = new Task(name, description, deadline, status);
-        listOfAllTasks.add(newTask);
+    static Command findCommandByName(String name) {
+        for (Command c : Command.values()) {
+            if (name.equals(c.name)) {
+                return c;
+            }
+        }
+        throw new NoSuchElementException("Нет такой команды");
     }
 
-    void addTaskbyTask(Task newTask) {
-        listOfAllTasks.add(newTask); //только для тестов
+    void addTask(String name, String description, LocalDate deadline, Status status) {
+        try {
+            this.findTaskByName(name);
+            throw new TaskNameDublicateException("Задача с таким именем уже есть");
+        } catch (NoSuchElementException e) {
+            Task newTask = new Task(name, description, deadline, status);
+            listOfAllTasks.add(newTask);
+        }
+    }
+
+    void addTaskbyTask(Task newTask) { //только для тестов
+        try {
+            this.findTaskByName(newTask.getName());
+            throw new TaskNameDublicateException("Задача с таким именем уже есть");
+
+        } catch (NoSuchElementException e) {
+            listOfAllTasks.add(newTask);
+        }
     }
 
     List<Task> getListOfAllTasks(){
@@ -42,7 +63,7 @@ public class Service {
     void changeTaskDescription(Task task, String description) {
         task.setDescription(description);
     }
-    void changeTaskDeadline(Task task, String deadline) {
+    void changeTaskDeadline(Task task, LocalDate deadline) {
         task.setDeadline(deadline);
     }
     void changeTaskStatus(Task task, Status status) {
@@ -54,7 +75,7 @@ public class Service {
 
     List<Task> filterTasksByStatus(Status status) {
         List<Task> filteredList = listOfAllTasks.stream()
-                .filter(task -> task.getTaskStatus().equals(status))
+                .filter(task -> task.getTaskStatus() == status)
                 .toList();
         return(filteredList);
     }
