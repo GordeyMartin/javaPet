@@ -17,7 +17,6 @@ public class Controller {
             Service myService = new Service();
 
             boolean stopped = false;
-            mainLoop:
             while (!stopped) {
                 try {
                     System.out.println("Введите команду");
@@ -38,7 +37,7 @@ public class Controller {
                                 deadline = LocalDate.parse(deadlineString);
                             } catch (DateTimeParseException e) {
                                 System.out.println("Неверный формат даты. Используйте ГГГГ-ММ-ДД");
-                                continue mainLoop;
+                                continue;
                             }
                             System.out.println("Введите статус задачи (todo, in progress, done)");
                             String statusString = myScanner.nextLine();
@@ -48,11 +47,11 @@ public class Controller {
                                     myService.addTask(nameToAdd, description, deadline, status);
                                 } catch (TaskNameDublicateException e) {
                                     System.out.println("Задача с таким именем уже есть");
-                                    continue mainLoop;
+                                    continue;
                                 }
                             } catch (NoSuchElementException e) {
                                 System.out.println("Нет такого статуса");
-                                continue mainLoop;
+                                continue;
                             }
                             break;
 
@@ -84,7 +83,7 @@ public class Controller {
                                         newDeadline = LocalDate.parse(newDeadlineString);
                                     } catch (DateTimeParseException e) {
                                         System.out.println("Неверный формат даты. Используйте ГГГГ-ММ-ДД");
-                                        continue mainLoop;
+                                        continue;
                                     }
                                     myService.changeTask(task, newDeadline, "deadline");
                                 }
@@ -95,12 +94,12 @@ public class Controller {
                                         myService.changeTask(task, newStatus, "status");
                                     } catch (NoSuchElementException e) {
                                         System.out.println("Нет такого статуса");
-                                        continue mainLoop;
+                                        continue;
                                     }
                                 }
                             } catch (NoSuchElementException e) {
                                 System.out.println("Такой задачи нет");
-                                continue mainLoop;
+                                continue;
                             }
                             break;
 
@@ -112,7 +111,7 @@ public class Controller {
                                 myService.deleteTask(task);
                             } catch (NoSuchElementException e) {
                                 System.out.println("Нет такой задачи");
-                                continue mainLoop;
+                                continue;
                             }
                             break;
 
@@ -123,7 +122,7 @@ public class Controller {
                                 System.out.println(myService.filterTasksByStatus(status));
                             } catch (NoSuchElementException e) {
                                 System.out.println("Нет такого статуса");
-                                continue mainLoop;
+                                continue;
                             }
                             break;
 
@@ -137,7 +136,7 @@ public class Controller {
                     }
                 } catch (NoSuchElementException e) {
                     System.out.println("Такой команды нет");
-                    continue mainLoop;
+                    continue;
                 }
             }
         } catch (Exception e) {
