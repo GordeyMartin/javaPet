@@ -31,7 +31,7 @@ public class Controller {
                             System.out.println("Введите описание задачи");
                             String description = myScanner.nextLine();
 
-                            System.out.println("Введите срок выполнения задачи (в формате ГГГГ-ММ-ДД)");
+                            System.out.println("Введите срок выполнения задачи. Используйте ГГГГ-ММ-ДД");
                             String deadlineString = myScanner.nextLine();
                             LocalDate deadline;
                             try {
@@ -44,7 +44,12 @@ public class Controller {
                             String statusString = myScanner.nextLine();
                             try {
                                 Status status = Service.findStatusByName(statusString);
-                                myService.addTask(nameToAdd, description, deadline, status);
+                                try {
+                                    myService.addTask(nameToAdd, description, deadline, status);
+                                } catch (TaskNameDublicateException e) {
+                                    System.out.println("Задача с таким именем уже есть");
+                                    continue mainLoop;
+                                }
                             } catch (NoSuchElementException e) {
                                 System.out.println("Нет такого статуса");
                                 continue mainLoop;
