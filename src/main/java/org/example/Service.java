@@ -1,89 +1,84 @@
 package org.example;
 
-import org.example.repository.Command;
-import org.example.repository.Status;
-import org.example.repository.Task;
+import org.example.data.Status;
+import org.example.data.Task;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.time.format.DateTimeParseException;
+import java.util.Scanner;
 
 public class Service {
-    List<Task> listOfAllTasks = new ArrayList<>();
+    Scanner myScanner;
+    Repository myRepository;
 
-    static Status findStatusByName(String name) {
-        for (Status s : Status.values()) {
-            if (name.equals(s.name)) {
-                return s;
-            }
-        }
-        throw new NoSuchElementException("Нет такого варианта для статуса задачи");
-    }
-    static Command findCommandByName(String name) {
-        for (Command c : Command.values()) {
-            if (name.equals(c.name)) {
-                return c;
-            }
-        }
-        throw new NoSuchElementException("Нет такой команды");
+    public Service(Scanner myScanner, Repository myRepository) {
+        this.myScanner = myScanner;
+        this.myRepository = myRepository;
     }
 
-    void addTask(String name, String description, LocalDate deadline, Status status) {
-        try {
-            this.findTaskByName(name);
-            throw new TaskNameDublicateException("Задача с таким именем уже есть");
-        } catch (NoSuchElementException e) {
-            Task newTask = new Task(name, description, deadline, status);
-            listOfAllTasks.add(newTask);
-        }
+    public void addTask(){
+        System.out.println("Введите название задачи");
+        String nameToAdd = myScanner.nextLine();
+
+        System.out.println("Введите описание задачи");
+        String description = myScanner.nextLine();
+
+        System.out.println("Введите срок выполнения задачи. Используйте ГГГГ-ММ-ДД");
+        String deadlineString = myScanner.nextLine();
+        LocalDate deadline;
+        deadline = LocalDate.parse(deadlineString);
+        System.out.println("Введите статус задачи (todo, in progress, done)");
+        String statusString = myScanner.nextLine();
+        Status status = Repository.findStatusByName(statusString);
+        myRepository.addTask(nameToAdd, description, deadline, status);
     }
 
-    void addTaskbyTask(Task newTask) { //только для тестов
-        try {
-            this.findTaskByName(newTask.getName());
-            throw new TaskNameDublicateException("Задача с таким именем уже есть");
-
-        } catch (NoSuchElementException e) {
-            listOfAllTasks.add(newTask);
+    public void listTasks() {
+        for (Task t : myRepository.getListOfAllTasks()) {
+            System.out.println(t);
         }
     }
 
-    List<Task> getListOfAllTasks(){
-        return listOfAllTasks;
-    }
+    public void editTask() {
+        System.out.println("Какую задачу вы хотите изменить? (Напишите имя задачи)");
+        String nameToEdit = myScanner.nextLine();
+        Task task = myRepository.findTaskByName(nameToEdit);
 
-    Task findTaskByName(String name) {
-        Task foundTask = listOfAllTasks.stream()
-                .filter(task -> task.getName().equals(name))
-                .findFirst()
-                .orElseThrow();
-        return foundTask;
-    }
-    <V> void changeTask(Task task, V newVal, String field) {
-        if (field.equals("description")) {
-            task.setDescription((String) newVal);
-        } else if (field.equals("deadline")) {
-            task.setDeadline((LocalDate) newVal);
-        } else if(field.equals("status")) {
-            task.setTaskStatus((Status) newVal);
+        System.out.println("Что вы хотите изменить? (описание, срок выполнения, статус)");
+        String changeWanted = myScanner.nextLine();
+
+        if (changeWanted.equals("описание")) {
+            System.out.println("Какое будет новое описание?");
+            String newDescription = myScanner.nextLine();
+            myRepository.changeTask(task, newDescription, "description");
+        }
+        if (changeWanted.equals("срок выполнения")) {
+            System.out.println("Какой будет новый срок выполнения?");
+            String newDeadlineString = myScanner.nextLine();
+            LocalDate newDeadline;
+            newDeadline = LocalDate.parse(newDeadlineString);
+            myRepository.changeTask(task, newDeadline, "deadline");
+        }
+        if (changeWanted.equals("статус")) {
+            System.out.println("Какой будет новый статус?");
+            Status newStatus = Repository.findStatusByName(myScanner.nextLine());
+            myRepository.changeTask(task, newStatus, "status");
         }
     }
 
-    void deleteTask(Task task) {
-        listOfAllTasks.remove(task);
+    public void deleteTask() {
+        System.out.println("Какую задачу вы хотите изменить? (Напишите имя задачи)");
+        String nameToDelete = myScanner.nextLine();
+        Task task = myRepository.findTaskByName(nameToDelete);
+        myRepository.deleteTask(task);
     }
 
-    List<Task> filterTasksByStatus(Status status) {
-        List<Task> filteredList = listOfAllTasks.stream()
-                .filter(task -> task.getTaskStatus() == status)
-                .toList();
-        return(filteredList);
+    public void filterTasks() {
+        System.out.println("Задачи с каким статусом вы ищете? (todo, in progress, done)");
+        Status status = Repository.findStatusByName(myScanner.nextLine());
+        System.out.println(myRepository.filterTasksByStatus(status));
     }
-    List<Task> sortTasks() {
-        List<Task> sortedList = listOfAllTasks.stream()
-                .sorted( (a,b) -> a.getName().compareTo(b.getName()))
-                .toList();
-        return sortedList;
+    public void sortTasks() {
+        System.out.println(myRepository.sortTasks());
     }
 }

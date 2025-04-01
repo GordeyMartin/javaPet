@@ -1,4 +1,4 @@
-package org.example.repository;
+package org.example.data;
 
 public enum Status {
     TODO("todo"), IN_PROGRESS("in progress"), DONE("done");

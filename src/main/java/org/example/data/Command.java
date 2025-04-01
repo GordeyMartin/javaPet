@@ -1,4 +1,4 @@
-package org.example.repository;
+package org.example.data;
 
 public enum Command {
     ADD("add"), LIST("list"), EDIT("edit"), DELETE("delete"),
