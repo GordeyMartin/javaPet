@@ -1,6 +1,6 @@
 package org.example;
 
-import org.example.exceptions.TaskNameDublicateException;
+import org.example.exceptions.TaskNameDuplicateException;
 import org.example.data.Status;
 import org.example.data.Task;
 import org.junit.jupiter.api.Assertions;
@@ -78,6 +78,6 @@ public class RepositoryTest {
 
     @Test
     void taskNameDublicateTest() {
-        Assertions.assertThrows(TaskNameDublicateException.class, () -> myRepository.addTask("Уборка", "Опять таки не забудь убраться", LocalDate.parse("2023-10-12"), Status.TODO));
+        Assertions.assertThrows(TaskNameDuplicateException.class, () -> myRepository.addTask("Уборка", "Опять таки не забудь убраться", LocalDate.parse("2023-10-12"), Status.TODO));
     }
 }

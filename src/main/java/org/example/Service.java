@@ -4,7 +4,6 @@ import org.example.data.Status;
 import org.example.data.Task;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
 import java.util.Scanner;
 
 public class Service {

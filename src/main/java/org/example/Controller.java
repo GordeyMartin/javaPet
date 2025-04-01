@@ -1,11 +1,8 @@
 package org.example;
 
-import org.example.exceptions.TaskNameDublicateException;
+import org.example.exceptions.TaskNameDuplicateException;
 import org.example.data.Command;
-import org.example.data.Status;
-import org.example.data.Task;
 
-import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
@@ -55,7 +52,7 @@ public class Controller {
                     }
                 } catch (DateTimeParseException e) {
                     System.out.println("Неверный формат даты. Используйте ГГГГ-ММ-ДД");
-                } catch (TaskNameDublicateException e) {
+                } catch (TaskNameDuplicateException e) {
                     System.out.println("Задача с таким именем уже есть");
                 } catch (NoSuchElementException e) {
                     System.out.println("Нет такого варианта");

@@ -1,6 +1,6 @@
 package org.example;
 
-import org.example.exceptions.TaskNameDublicateException;
+import org.example.exceptions.TaskNameDuplicateException;
 import org.example.data.Command;
 import org.example.data.Status;
 import org.example.data.Task;
@@ -33,7 +33,7 @@ public class Repository {
     void addTask(String name, String description, LocalDate deadline, Status status) {
         try {
             this.findTaskByName(name);
-            throw new TaskNameDublicateException("Задача с таким именем уже есть");
+            throw new TaskNameDuplicateException("Задача с таким именем уже есть");
         } catch (NoSuchElementException e) {
             Task newTask = new Task(name, description, deadline, status);
             listOfAllTasks.add(newTask);
@@ -43,7 +43,7 @@ public class Repository {
     void addTaskbyTask(Task newTask) { //только для тестов
         try {
             this.findTaskByName(newTask.getName());
-            throw new TaskNameDublicateException("Задача с таким именем уже есть");
+            throw new TaskNameDuplicateException("Задача с таким именем уже есть");
 
         } catch (NoSuchElementException e) {
             listOfAllTasks.add(newTask);
@@ -55,11 +55,10 @@ public class Repository {
     }
 
     Task findTaskByName(String name) {
-        Task foundTask = listOfAllTasks.stream()
+        return listOfAllTasks.stream()
                 .filter(task -> task.getName().equals(name))
                 .findFirst()
                 .orElseThrow();
-        return foundTask;
     }
     <V> void changeTask(Task task, V newVal, String field) {
         if (field.equals("description")) {
@@ -76,15 +75,13 @@ public class Repository {
     }
 
     List<Task> filterTasksByStatus(Status status) {
-        List<Task> filteredList = listOfAllTasks.stream()
+        return listOfAllTasks.stream()
                 .filter(task -> task.getTaskStatus() == status)
                 .toList();
-        return(filteredList);
     }
     List<Task> sortTasks() {
-        List<Task> sortedList = listOfAllTasks.stream()
+        return listOfAllTasks.stream()
                 .sorted( (a,b) -> a.getName().compareTo(b.getName()))
                 .toList();
-        return sortedList;
     }
 }
